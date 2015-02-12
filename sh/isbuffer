@@ -1,0 +1,31 @@
+#!/bin/bash
+#Por --> igorsca(at)gmail.com
+#							ISBUFFER
+#Script para ordernar as splash images de acordo com a resolucao do framebuffer
+#
+if [ -e /proc/splash ];
+then
+	if [ `cat /proc/splash|cut -d" " -f5|cut -c 1` == "1" ];
+	then
+		echo -e "\033[35;40mSplash 1024x768\033[0m"
+
+			splash -s -u1 -n /etc/bootsplash/themes/GalaxySlack2/config/bootsplash-1024x768.cfg
+			splash -s -u2 -n /etc/bootsplash/themes/pcxz/config/bootsplash-1024x768.cfg
+			splash -s -u3 -n /etc/bootsplash/themes/GalaxySlack2/config/bootsplash-1024x768.cfg
+			splash -s -u4 -n /etc/bootsplash/themes/pcxz/config/bootsplash-1024x768.cfg
+			splash -s -u5 -n /etc/bootsplash/themes/GalaxySlack2/config/bootsplash-1024x768.cfg
+	
+	else
+		echo -e "\033[35;40mSplash 800x600\033[0m"
+			for oito in `seq 5`
+			do
+			splash -s -u$oito -n /etc/bootsplash/themes/new/config/bootsplash.cfg
+			done
+		exit 0
+	fi
+else
+	echo -e "\033[31;40mSeu Kernel esta sem suporte ao bootsplash!!! 
+Verifique os paches para seu kernel e recompile.
+Se voce tem duvidas de como fazer isso, mande um e-mail para mim... : )\033[0m
+\033[32;40me-mail --> igorsca(at)gmail.com\033[0m"
+fi

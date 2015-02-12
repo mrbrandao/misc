@@ -1,0 +1,175 @@
+#!/bin/bash
+#Ctba 06/02/2008
+#Por: Igor Scarinci Brandao
+#e-mail: igorsca(at)gmail.com
+#-----------------------------------------------------\\WIMO\\--------------------------------------------#
+#		Wimo (Wifi modes) é um script desenvolvido para facilitar a alteracao de modos das placas wifi atheros.
+#		se vc tem uma placa wireless e esta usando os drivers do madwifi, provavelmente vai achar isso 
+#		util quando for alterar entre os modos de sua interface.
+#---------------------------------------------------------------------------------------------------------#
+
+if [ "$#" -ne 2 ]
+then
+	echo  -e "\033[1;31;40mUse: $0 opcao interface
+	\033[34;40mEx: wimo -mo ath0\033[32;40m
+	Opcoes :
+			-ma 	{modo Managed} --> default*
+		     	-hoc	{modo adhoc}
+			-ap	{modo ap}
+			-mo	{modo monitor}
+			-w	{modo wds}
+			-ah	{modo ahdemo}
+			-d	{modo destruicao} --> Zera Interface\033[0m
+										"
+	exit 1
+fi
+
+MODE=
+if [ "$1" = -ma ]
+then
+	MODE=1
+	shift
+	ifconfig "$1" down
+	wlanconfig "$1" destroy
+	
+	for i in '!' '!!' '!!!' 
+	do	
+		clear
+		tput cup 1 0
+		echo "Espere um momento"
+		tput cup 2 0
+		echo "$i"
+		sleep 1
+	done
+
+	wlanconfig "$1" create wlandev wifi0 wlanmode sta
+	echo -e "\033[32;40mModo Managed setado com sucesso!\033[0m"
+fi	
+
+if [ "$1" = -hoc ]
+then
+	MODE=1
+	shift
+	ifconfig "$1" down
+	wlanconfig "$1" destroy
+	
+	for i in '!' '!!' '!!!' 
+	do	
+		clear
+		tput cup 1 0
+		echo "Espere um momento"
+		tput cup 2 0
+		echo "$i"
+		sleep 1
+	done
+
+	wlanconfig "$1" create wlandev wifi0 wlanmode adhoc
+	echo -e "\033[32;40mModo adhoc setado com sucesso!\033[0m"
+fi	
+
+if [ "$1" = -ap ]
+then
+	MODE=1
+	shift
+	ifconfig "$1" down
+	wlanconfig "$1" destroy
+	
+	for i in '!' '!!' '!!!' 
+	do	
+		clear
+		tput cup 1 0
+		echo "Espere um momento"
+		tput cup 2 0
+		echo "$i"
+		sleep 1
+	done
+
+	wlanconfig "$1" create wlandev wifi0 wlanmode ap
+	echo -e "\033[32;40mModo ap setado com sucesso!\033[0m"
+fi	
+
+if [ "$1" = -mo ]
+then
+	MODE=1
+	shift
+	ifconfig "$1" down
+	wlanconfig "$1" destroy
+	
+	for i in '!' '!!' '!!!' 
+	do	
+		clear
+		tput cup 1 0
+		echo "Espere um momento"
+		tput cup 2 0
+		echo "$i"
+		sleep 1
+	done
+	
+	wlanconfig "$1" create wlandev wifi0 wlanmode monitor
+	echo -e "\033[32;40mModo monitor setado com sucesso!\033[0m"
+fi
+
+if [ "$1" = -w ]
+then
+	MODE=1
+	shift
+	ifconfig "$1" down
+	wlanconfig "$1" destroy
+	
+	for i in '!' '!!' '!!!' 
+	do	
+		clear
+		tput cup 1 0
+		echo "Espere um momento"
+		tput cup 2 0
+		echo "$i"
+		sleep 1
+	done
+
+	wlanconfig "$1" create wlandev wifi0 wlanmode wds
+	echo -e "\033[32;40mModo wds setado com sucesso!\033[0m"
+fi	
+
+if [ "$1" = -ah ]
+then
+	MODE=1
+	shift
+	ifconfig "$1" down
+	wlanconfig "$1" destroy
+	
+	for i in '!' '!!' '!!!' 
+	do	
+		clear
+		tput cup 1 0
+		echo "Espere um momento"
+		tput cup 2 0
+		echo "$i"
+		sleep 1
+	done
+
+	wlanconfig "$1" create wlandev wifi0 wlanmode ahdemo
+	echo -e "\033[32;40mModo ahdemo setado com sucesso!\033[0m"
+fi	
+
+if [ "$1" = -d ]
+then
+	MODE=1
+	shift
+	ifconfig "$1" down
+	wlanconfig "$1" destroy
+	if [ -e /var/run/wpa_supplicant/"$1" ]
+	then
+		rm -rf /var/run/wpa_supplicant/"$1"
+	fi
+	
+	for i in '!' '!!' '!!!' 
+	do	
+		clear
+		tput cup 1 0
+		echo "Espere um momento"
+		tput cup 2 0
+		echo "$i"
+		sleep 1
+	done
+	echo -e "\033[32;40mInterface destruida!!!\033[0m"
+fi	
