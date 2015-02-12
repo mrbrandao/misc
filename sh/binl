@@ -1,0 +1,91 @@
+#!/bin/sh
+#By: isca -> igorsca(at)gmail.com
+#Script para inicializar drivers de placas de rede para WindowsXP/2003/2k em Servidores RisLinux
+#Deve ser usado com o lanpack.7z do DriverPackSolution
+### BEGIN INIT INFO
+# Provides:          Binl
+# Required-Start:    $remote_fs $network $syslog
+# Required-Stop:     $remote_fs $network $syslog
+# Default-Start:     3 5           # em q runlevel começa
+# Default-Stop:      0 1 6    # em qual para
+# Short-Description: Start daemon at boot time
+# Description:       Enable service provided by daemon.
+### END INIT INFO
+##UXBKP##
+
+PATH="/sbin:/bin:/usr/sbin:/usr/bin"
+DAEMON="/sbin/binlsrv.py"
+INFPARS="/sbin/infparser.py"
+
+test -x "${DAEMON}" || exit 0
+test -x "${INFPARS}" || exit 0
+
+NAME="Binl"
+DESC="RIS Server"
+PIDFILE="/var/run/binlsrv.pid"
+DEFAULTS="/etc/default/binl"
+
+# Include tftpd-hpa-server defaults if available
+if [ -r "${DEFAULTS}" ]
+then
+	. "${DEFAULTS}"
+fi
+
+set -e
+
+. /lib/lsb/init-functions
+
+do_start()
+{
+#	ln -f ${XINF}/* ${XP}
+	cp -rvf ${XINF}/* ${XP} 2>&1 >> /dev/null
+	((cd ${XINF} && rename 'y/A-Z/a-z/' * )) 2>>/dev/null
+	((cd ${XINF}&& cd ..&&  $INFPARS ${XINF}))  #2>&1 >>${BINLLOG}
+	start-stop-daemon --start --quiet --oknodo --exec ${DAEMON} -- \
+		${OPTIONS} ${XPDEV} 
+}
+
+do_stop ()
+{
+	kill -9 `cat "$PIDFILE"` 2>> /dev/null
+}
+
+do_reload ()
+{
+	start-stop-daemon --stop --quiet --oknodo --name ${NAME} --signal 1
+}
+
+case "${1}" in
+	start)
+		log_daemon_msg "Starting ${DESC}" "${NAME}"
+		echo "\n"
+		do_start 2>> /dev/null #&&tail -5 ${BINLLOG}
+		log_end_msg ${?}
+		;;
+
+	stop)
+		log_daemon_msg "Stopping ${DESC}" "${NAME}"
+		do_stop
+		log_end_msg ${?}
+		;;
+
+	restart|force-reload)
+		log_daemon_msg "Restarting ${DESC}" "${NAME}"
+		echo "\n"
+		do_stop
+		sleep 1
+		do_start 2>> /dev/null
+		log_end_msg ${?}
+		;;
+
+	status)
+		status_of_proc ${DAEMON} ${NAME}
+		;;
+
+	*)
+		echo "Usage: ${0} {start|stop|restart|force-reload|status}" >&2
+		exit 1
+		;;
+esac
+
+exit 0

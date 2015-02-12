@@ -1,0 +1,104 @@
+#!/bin/bash
+#Scrpit de Registro de Accessos a Internet
+#Sarg 2.2.0
+#By: Igor Scarinci Brandao
+#e-mail --> igorsca@gmail.com
+##STRBKP##
+#
+#
+stmp=/tmp/sarg
+bsarg=/usr/local/bin/sarg
+sconf=/usr/local/sarg/sarg-isb.conf
+older=/var/www/htdocs/sarg
+index=/var/www/htdocs/sarg
+monitor=/var/www/htdocs/monitor
+squidir=/usr/local/squid
+usquid=squid
+gsquid=squid
+
+#Cores
+azul="\033[34;40m"
+vermelho="\033[31;40m"
+verde="\033[32;40m"
+amarelo="\033[33;40;1m"
+apaga="\033[0m"
+#Funcoes
+#___________
+
+limpa(){
+rm -rf $older/*
+
+if [ -d $stmp ]
+then
+	rm -rf $monitor
+	rm -rf $stmp
+	rm -rf $older/*
+else
+
+	rm -rf $monitor
+	rm -rf $older/*
+fi
+}
+
+#-----------
+
+gera(){
+echo -e ""$verde"Lendo arquivo "$sconf" para gerar relatorio"$apaga""
+"$bsarg" -f "$sconf" 
+if [ -d "$index" ]
+then	
+	ln -sf  "$index" "$monitor"
+else
+	echo -e ""$vermelho"Nao foi possivel fazer link monitor, "$index" nao foi encontrado"$apaga""
+fi
+}
+
+#-----------
+
+delog(){
+rm -rf /usr/local/squid/var/logs/* 
+echo "" > /usr/local/squid/var/logs/access.log
+chown -R $usquid.$gsquid $squidir
+}
+
+
+case "$1" in
+
+clean)
+limpa
+echo -e ""$verde"Limpeza do Sarg efetuada!"$apaga""
+exit
+;;
+
+make)
+gera
+echo -e ""$verde" Relatorio `date` esta pronto."$apaga""
+exit
+;;
+
+dlog)
+delog
+echo -e ""$verde" Todos os Logs do Squid estao vazios agora."$apaga""
+exit
+;;
+
+help)
+clear
+echo -e "
+$0 funciona com as sintaxes: "$amarelo"clean make dlog help"$apaga".
+
+"$amarelo"clean"$apaga" : Limpa os diretorios antigos do Sarg
+"$amarelo"make"$apaga"  : Cria um relatorio novo do sarg com base no access.log do squid.
+"$amarelo"dlog"$apaga"  : Apaga os todos os arquivos de log do squid.
+"$amarelo"help"$apaga"  : Exibe essa ajuda.
+
+						Por:"$azul" Igor Brandao"$apaga"
+						email:"$verde" igorsca@gmail.com"$apaga"
+						"
+;;
+
+*)
+echo -e "\033[32;40mUse clean|make|dlog|help\033[0m"
+;;
+esac
+exit

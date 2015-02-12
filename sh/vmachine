@@ -1,0 +1,150 @@
+#!/bin/sh
+####################################################
+##by: Igor Brandao
+##email: igorsca(at)gmail.com
+###STRBKP##
+##Script para Automatizar a Inicializacao das maquinas por Vmware Workstation
+##Testando no Fedora 15
+## description: Vmware Machines auto start-stop script.
+##
+## Set MACHINE_PATH  to be equivalent to the Vmware machines place 
+## from which you wish to execute vmrun start /machine_path/yourmachine
+##
+## Set RUN to the path of your vmrun binary
+## Set reguser as your default registeres Vmware user
+#####################################################
+
+### BEGIN INIT INFO
+# Provides: VMware VMs Control
+# Required-Start: $local_fs $network $syslog
+# Required-Stop:
+# Default-Start: 3 5
+# Default-Stop: 0 6
+# Short-Description: Starts or stops VMware Workstation VMs
+# Description: Starts or stops VMware Workstation virtual machines
+### END INIT INFO
+
+
+#Variaveis Globais
+
+#Variaveis Globais
+reguser=root
+machine_path="/data/vmachines"
+run=/usr/bin/vmrun
+
+##----------------//--------------##
+
+#Variaveis Estaticas
+select=`find "$machine_path" -type f -name "$2.vmx"`
+home=`dirname "$select"`
+out="/tmp/out"
+
+#COLORS
+white="\033[37;40m"
+green="\033[32;40m"
+red="\033[31;40m"
+cian="\033[36;40m"
+clear="\033[0m"
+
+#Inicio das Funcoes
+machines () {
+find "$machine_path" -type f -name *.vmx >$out
+}
+
+startup_machines () {
+machines
+for hw in `cat "$out"`
+do
+	name=`cat "$hw"|grep -i displayname|cut -d'=' -f2|tr '"' ' '`
+	su - $reguser -c ""$run" start "$hw" nogui" 2>&1>/dev/null
+	sleep 1
+	echo -e "Startup: "$name"		 "$white"["$green" OK"$white" ]"$clear""
+	rm -rf "$out"
+done
+}
+
+shutdown_machines () {
+machines
+for hw in `cat "$out"`
+do
+	name=`cat "$hw"|grep -i displayname|cut -d'=' -f2|tr '"' ' '`
+	su - "$reguser" -c ""$run" stop "$hw" soft" 2>&1>/dev/null
+	echo -e "Shutdown: "$name"				"$white"["$green" OK"$white" ]""$clear"
+	sleep 1
+	rm -rf "$out"
+#	rm -rf "$vmfstart"
+done
+}
+
+#
+#Fim das funcoes
+#-----------//----------
+
+case "$1" in
+
+start)
+startup_machines
+;;
+stop)
+shutdown_machines 
+;;
+startone)
+if [ -e "$home"/"$2.vmx" ]
+then
+ 	su - "$reguser" -c ""$run" start "$home"/"$2.vmx" nogui" 2>&1>/dev/null
+	echo -e "Startup: "$2"				"$white"["$green" OK"$white" ]""$clear"
+	else
+	echo -e "$red""Maquina "$green""$2""$red" nao foi encontrada...""$clear"
+	echo -e "Verifique se a variavel "\machine_path"\ esta configurada corretamente."
+fi
+;;
+stopone)
+if [ -e "$home"/"$2.vmx" ]
+then
+	su - "$reguser" -c ""$run" stop "$home"/"$2.vmx" soft" 2>&1>/dev/null
+	echo -e "Shutdown: "$2"				"$white"["$green" OK"$white" ]""$clear"
+	else
+	echo -e "$red""Maquina "$green""$2""$red" nao foi encontrada...""$clear"
+	echo -e "Verifique se a variavel "\machine_path"\ esta configurada corretamente."
+fi
+;;
+restart)
+shutdown_machines
+startup_machines
+;;
+status)
+"$run" list
+;;
+help)
+echo -e "
+"$cian"Usage Modes:"$clear"
+	 
+	 "$green"start			"$white"Startup all Machines
+	 "$green"stop			"$white"Shutdown all Machines
+	 "$green"restart		"$white"Shutdown and Startup all Machines
+	 "$green"startone "$red"\"name\""$white"	Startup only one machine by name
+	 "$green"stopone  "$red"\"name\""$white"	Shutdown only one machine by name
+	 "$green"status			"$white"List all Running Machines
+	 "$green"help			"$white"This help"$clear"
+
+"$cian"Samples:"$white"
+ 
+	"$0" "$green"startone "$white"win2003
+	
+	service "$cian"vmachine "$green"start"$clear"
+
+
+"$cian"Author:"$white"
+"$green"Igor S. Brandao"$white"
+"$cian"mail:"$green" igorsca@gmail.com"$clear"
+"
+;;
+*)
+echo -e ""$cian"Usage:"$green"
+
+	{start|stop|startone|stopone|status|help}
+"$clear"
+"
+;;
+esac
+exit 0

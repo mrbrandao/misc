@@ -1,0 +1,114 @@
+#!/bin/sh
+#By: isca -> igorsca(at)gmail.com
+#Oracle_10g startup script for fedora 15
+# chkconfig: 345 99 10
+# description: Oracle auto start-stop script.
+#
+# Set ORACLE_HOME to be equivalent to the $ORACLE_HOME
+# from which you wish to execute dbstart and dbshut;
+#
+# Set ORA_OWNER to the user id of the owner of the 
+# Oracle database in ORACLE_HOME.
+
+
+ORACLE_HOME=/data/database/app/oracle/product/10.2.0/db_1
+#ORACLE_HOME=/home/oracle/oracle/product/10.2.0/db_1
+ORA_OWNER=oracle
+ORA_SID=`cat /etc/oratab |grep :Y|cut -f 1 -d":"`
+SUSER="SIDUSER"
+SPASS="SIDPASSWORD"
+DB="DBINSTANCE"
+#COLORS
+white="\033[37;40m"
+green="\033[32;40m"
+red="\033[31;40m"
+clear="\033[0m"
+
+#Inicio das Funcoes
+#Funcao Checar Status do Banco 
+state () {
+"$ORACLE_HOME"/bin/sqlplus -s /nolog > /dev/null 2>&1 <<EOF
+whenever sqlerror exit failure
+connect $SUSER/$SPASS@$DB as sysdba
+exit success
+EOF
+}
+
+dbstate() {
+state 
+if [ $? -ne 0 ]; then
+ echo -e "$red""Connection failed : DB is down""$clear"
+ exit 1
+else
+ echo -e "$green""Connection succeeded : DB is up""$clear"
+fi
+}
+
+
+if [ ! -f $ORACLE_HOME/bin/dbstart ]
+then
+    echo -e "$red""Oracle startup: cannot start""$clear"
+    exit
+fi
+
+case "$1" in
+start)
+        # Inicia as Instanceas do Oracle:
+	#state
+#	if [ $? -ne 0 ]
+#	then 
+	su - $ORA_OWNER -c "$ORACLE_HOME/bin/lsnrctl start" 2>&1 >/dev/null
+	echo -e "Initializing Listner on Port 1521					"$white"["$green" OK "$white"]"$clear""
+	sleep 1
+        su - $ORA_OWNER -c $ORACLE_HOME/bin/dbstart 2>&1 >/dev/null
+	echo -e "Initializing DB Instances - "$ORA_SID"	 				"$white"["$green" OK "$white"]"$clear""
+	sleep 1
+	touch /var/lock/subsys/dbora
+#	else
+#		echo -e ""$red"DB Seems to be Up AllReady"$clear""	
+#	fi
+        ;;
+stop)
+        # Parar Instanceas do Oracle:
+	echo -e "$red""Derrubando Instancia:$clear **"$green$ORA_SID"$clear**"
+        su - $ORA_OWNER -c $ORACLE_HOME/bin/dbshut 2>&1>/dev/null
+	echo -e "Stoping DB Instances - "$ORA_SID"		 				"$white"["$green" OK "$white"]"$clear""
+      	su - $ORA_OWNER -c "$ORACLE_HOME/bin/lsnrctl stop" 2>&1>/dev/null
+	echo -e "Stop Listner on Port 1521						"$white"["$green" OK "$white"]"$clear""
+        rm -f /var/lock/subsys/dbora
+        ;;
+restart)
+	$0 stop
+	$0 start
+	;;
+
+isqlstart)
+        echo  "*** Starting Oracle iSQL Plus *** "
+        su - $ORA_OWNER -c "$ORACLE_HOME/bin/isqlplusctl start"
+        echo "*** Note: You can access service at url:  http://$(hostname):5560/isqlplus"
+        ;;
+isqlstop)
+        echo  "*** Stopping Oracle iSQL Plus *** "
+        su - $ORA_OWNER -c "$ORACLE_HOME/bin/isqlplusctl stop"
+        ;;
+emstart)
+        echo  "*** Starting Oracle Enterprise Manager 10g Database Control ***"
+        su - $ORA_OWNER -c "$ORACLE_HOME/bin/emctl start dbconsole"
+        echo "*** Note: You can access service at url:  http://$(hostname):1158/em"
+        ;;
+emstop)
+        echo  "*** Stopping Oracle Enterprise Manager 10g Database Control ***"
+        su - $ORA_OWNER -c "$ORACLE_HOME/bin/emctl stop dbconsole"
+        ;;
+status)
+	#Versao Beta do STATUS
+	#Ainda funcionando somento com Usuario Oracle
+	#Bug com Variaveis na funcao
+        echo "*** Oracle database status ***"
+        dbstate
+        ;;
+*)
+        echo -e "$green""Usage: $0 {start|stop|restart|isqlstart|isqlstop|emstart|emstop}""$clear"
+        exit 1
+	;;
+esac
