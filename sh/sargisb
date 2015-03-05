@@ -1,8 +1,8 @@
 #!/bin/bash
 #Scrpit de Registro de Accessos a Internet
-#Sarg 2.2.0
-#By: Igor Scarinci Brandao
-#e-mail --> igorsca@gmail.com
+#Sarg 2.3.0
+#By: isca0
+#e-mail --> igorsca(at)gmail.com
 ##STRBKP##
 #
 #
@@ -12,9 +12,12 @@ sconf=/usr/local/sarg/sarg-isb.conf
 older=/var/www/htdocs/sarg
 index=/var/www/htdocs/sarg
 monitor=/var/www/htdocs/monitor
-squidir=/usr/local/squid
-usquid=squid
-gsquid=squid
+
+#squid global vars
+user=squid
+group=squid
+squid="/usr/local/squid/sbin/squid"
+squidlog="/usr/local/squid/var/logs"
 
 #Cores
 azul="\033[34;40m"
@@ -56,9 +59,8 @@ fi
 #-----------
 
 delog(){
-rm -rf /usr/local/squid/var/logs/* 
-echo "" > /usr/local/squid/var/logs/access.log
-chown -R $usquid.$gsquid $squidir
+su $user -c "$squid -k rotate"	
+rm -rf $squidlog/*.2
 }
 
 
@@ -89,11 +91,11 @@ $0 funciona com as sintaxes: "$amarelo"clean make dlog help"$apaga".
 
 "$amarelo"clean"$apaga" : Limpa os diretorios antigos do Sarg
 "$amarelo"make"$apaga"  : Cria um relatorio novo do sarg com base no access.log do squid.
-"$amarelo"dlog"$apaga"  : Apaga os todos os arquivos de log do squid.
+"$amarelo"dlog"$apaga"  : Faz o rotate de logs do squid.
 "$amarelo"help"$apaga"  : Exibe essa ajuda.
 
 						Por:"$azul" Igor Brandao"$apaga"
-						email:"$verde" igorsca@gmail.com"$apaga"
+						email:"$verde" igorsca(at)gmail.com"$apaga"
 						"
 ;;
 
