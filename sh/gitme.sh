@@ -25,7 +25,14 @@ case "$1" in
 pull)
 #git pull
 git pull --recurse-submodules
+;;
+pall)
+#use for recursive pull
 git submodule foreach --recursive git pull
+;;
+porg)
+#use for origin master recursive pull
+git submodule foreach --recursive git pull origin master
 ;;
 update)
 git submodule update
@@ -41,7 +48,7 @@ $0 master
 $0 pull
 ;;
 *)
-echo "Use: all/pull/update/master"
+echo "Use: all/pull/update/master/pall/porg"
 ;;
 
 esac
