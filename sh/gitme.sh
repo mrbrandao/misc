@@ -28,6 +28,7 @@ git pull --recurse-submodules
 ;;
 pall)
 #use for recursive pull
+git pull #pull the master repo then the submodules
 git submodule foreach --recursive git pull
 ;;
 porg)
