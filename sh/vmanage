@@ -1,0 +1,27 @@
+#!/bin/sh
+#This script is util for manage VMWare Machines from command line
+#The main objetive of this script is start machines with headless and restore snapshot's
+#
+#some documental commands are:
+# * vmrun list, vmrun listSnapshot, vmrun restoreSnapshot etc...
+case $1 in
+-lm)
+vmrun list 
+;;
+-ls)
+vmrun listSnapshot $2
+;;
+-rs)
+vmrun restoreSnapshot $2 $3
+;;
+*)
+echo use $0 with:
+echo "	
+	* -lm --> list vm's
+	* -ls [machine] --> list Snapshot's
+	* -rs [snapshot, machine] --> restore snapshot for machine
+"	
+exit 0
+;;
+esac
+exit 
