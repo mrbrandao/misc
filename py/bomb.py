@@ -20,4 +20,5 @@ while bombs != -1: #only for show the zero at end
 		bombm=0
 		bombs=59
 print "Boooommm"
+	
 
