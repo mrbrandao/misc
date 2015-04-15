@@ -1,0 +1,20 @@
+/* -- Teste de Botao --
+Um teste bobo pra ver o funcionamento do botao.
+Este este faz com que o Led apague por 2segundos quando
+o botao for pressionado*/
+int ledPin = 8;
+int button = 2;
+
+void setup(){
+  pinMode(ledPin, OUTPUT);
+  pinMode(button, INPUT);
+}
+
+void loop(){
+  digitalWrite(ledPin, HIGH);
+  int state = digitalRead(button);
+  if (state == HIGH){
+    digitalWrite(ledPin, LOW);
+    delay(2000);
+  }
+}
