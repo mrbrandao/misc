@@ -5,8 +5,19 @@
 
 PID=/tmp/autoconnect
 ppp=ppp0
+
+pings(){
+if ping -c 3 google.com
+then
+	echo "Conexao bem estabelecida"
+else
+	echo "Erro ainda sem resolucao de nomes"
+	continue
+fi	
+}
 autoconnect(){
-if ifconfig $ppp
+#get ifconfig state and send all outputs to null
+if ifconfig $ppp &>/dev/null
 then
 	echo "So far so good - this connection are fine"
 	continue
@@ -14,13 +25,7 @@ else
 	pppoe-stop
 	sleep 5
 	pppoe-start
-	if ping -c 3 google.com
-	then
-		echo "Conexao bem estabelecida"
-	else
-		echo "Erro ainda sem resolucao de nomes"
-		continue
-	fi	
+	pings
 fi
 }
 
