@@ -1,0 +1,51 @@
+#!/bin/sh
+#This script must test pppoe connection if it's down reconnect
+#It may running as daemon on a while true or on a insane crontab timer like */1 * * * *
+#By isca --> github.com/isca0
+
+PID=/tmp/autoconnect
+ppp=ppp0
+autoconnect(){
+if ifconfig $ppp
+then
+	echo "So far so good - this connection are fine"
+	continue
+else
+	pppoe-stop
+	sleep 5
+	pppoe-start
+	if ping -c 3 google.com
+	then
+		echo "Conexao bem estabelecida"
+	else
+		echo "Erro ainda sem resolucao de nomes"
+		continue
+	fi	
+fi
+}
+
+case $1 in
+start)
+autoconnect	
+;;
+startd)	
+	pidof -sx $0 > $PID
+	while true
+	do
+		autoconnect
+	done
+;;
+stop)
+if [ ! -e $PID ]
+then
+	echo "$0 nao esta rodando..."
+	exit 0
+fi
+kill -9 `cat $PID`
+rm -rf $PID
+echo "This is an ex-process... by the way it means stop"
+;;
+*)
+echo "use: $0 [startd|start|stop]"
+;;
+esac
