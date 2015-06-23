@@ -6,6 +6,7 @@ int ledPin = 8;
 int button = 2;
 
 void setup(){
+	Serial.begin(9600);
   pinMode(ledPin, OUTPUT);
   pinMode(button, INPUT);
 }
@@ -16,5 +17,6 @@ void loop(){
   if (state == HIGH){
     digitalWrite(ledPin, LOW);
     delay(2000);
+    Serial.println(state);
   }
 }
