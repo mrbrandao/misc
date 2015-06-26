@@ -15,20 +15,20 @@ defaults write com.apple.desktopservices DSDontWriteNetworkStores true
 echo "Irei pedir sua senha..."
 $SUDO sh -c 'echo "
 #Aliass Fields
-alias vi="vim"
-alias ls="ls -G"
-alias cp="cp -v"
-alias rm="rm -i"
-alias mv="mv -v"
-alias ll="ls -lhG"
-alias la="ls -aG"
-alias l="ls -lahFG"
+alias vi=\"vim\"
+alias ls=\"ls -G\"
+alias cp=\"cp -v\"
+alias rm=\"rm -i\"
+alias mv=\"mv -v\"
+alias ll=\"ls -lhG\"
+alias la=\"ls -aG\"
+alias l=\"ls -lahFG\"
 " >> /etc/bashrc'
 #
 #Enable colors on vim and set vim as default
 echo "Adicionando cores e syntaxes ao vim"
 $SUDO sh -c 'echo "
-#Colors and syntax to vim
+\"Colors and syntax to vim
 syntax on
 " >> /usr/share/vim/vimrc'
 
