@@ -7,6 +7,32 @@
 char buffer[9];
 int r, w;
 int led = 13;
+int addr = 0;
+byte value;
+
+void blinker(int pisca){
+  while (pisca != 0){
+    digitalWrite(led, 1);
+    delay(200);
+    digitalWrite(led, 0);
+    delay(200);
+    pisca--;
+  }
+}
+
+void eeread(char* data){
+  if (data[0] == 'r') {
+    addr = strtol(data+1, NULL,10);
+    addr = constrain(addr,0,1023);
+    value = EEPROM.read(addr);
+    blinker(1);
+    Serial.print("The address ");
+    Serial.print(addr);
+    Serial.print(" has this value: ");
+    Serial.println(value);
+  }
+}
+    
 
 void setup() {
   // put your setup code here, to run once:
@@ -26,6 +52,10 @@ void loop() {
         }
         while (numChar--) {
                 buffer[index++] = Serial.read();
+        }
+        eeread(buffer);
+        for (int  x=0; x<9;x++){
+          buffer[x]='\0';
         }
   }
 
