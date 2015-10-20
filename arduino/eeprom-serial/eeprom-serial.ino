@@ -1,6 +1,7 @@
 /* Must recevive r ou w from serial and write on eeprom.
   If read command is sucess blink a led one time
   If write sucess blink led two times
+  by: isca0 --> igorsca at gmail dot com
 */
 #include <EEPROM.h>
 
@@ -20,6 +21,7 @@ void blinker(int pisca){
   }
 }
 
+
 void eeread(char* data){
   if (data[0] == 'r') {
     addr = strtol(data+1, NULL,10);
@@ -32,7 +34,21 @@ void eeread(char* data){
     Serial.println(value);
   }
 }
-    
+
+void eewrite(char* data){
+  if (data[0] == 'w') {
+    addr = strtol(data+1, NULL,10);
+    value = strtol(data+1, NULL, 10);
+    addr = constrain(addr,0,1023);
+    value = constrain(value,0,255);
+    //value = EEPROM.read(addr,value);
+    blinker(2);
+    Serial.print("The address ");
+    Serial.print(addr);
+    Serial.print(" recive this value: ");
+    Serial.println(value);
+  }
+}
 
 void setup() {
   // put your setup code here, to run once:
@@ -54,9 +70,11 @@ void loop() {
                 buffer[index++] = Serial.read();
         }
         eeread(buffer);
+        eewrite(buffer);
         for (int  x=0; x<9;x++){
           buffer[x]='\0';
         }
+        Serial.flush();
   }
 
 
