@@ -5,7 +5,7 @@
 #i use this a lot to make a little embeded systems with C binaries
 
 lib=`ldd $1|cut -d'>' -f 2|cut -d'(' -f1`
-libdir="./pak"
+libdir="./lib"
 bindir="./bin"
 
 if [ ! -e $libdir ]
