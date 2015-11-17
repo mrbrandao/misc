@@ -5,24 +5,38 @@
 #i use this a lot to make a little embeded systems with C binaries
 
 lib=`ldd $1|cut -d'>' -f 2|cut -d'(' -f1`
-dir="./pak"
+libdir="./pak"
+bindir="./bin"
 
-for i in $lib
+if [ ! -e $libdir ]
+then
+	mkdir $libdir
+fi
+
+if [ ! -e $bindir ]
+then
+	mkdir $bindir
+fi
+
+for libs in $lib
 do
-	if [ -e $i ]
+	if [ -e $libs ]
 	then
-		links=`file $i|cut -d':' -f2|cut -d' ' -f2`
-		static=`ls -l $i|cut -d'>' -f2`
-		onde=`whereis $static|cut -d' ' -f2`
-		linkfile=`file $i|cut -d':' -f1|tr '/' '\n'|fgrep "."`
+		links=`file $libs|cut -d':' -f2|cut -d' ' -f2`
+		static=`ls -l $libs|cut -d'>' -f2`
+		origem=`whereis $static|cut -d' ' -f2`
+		linkfile=`file $libs|cut -d':' -f1|tr '/' '\n'|fgrep "."`
 		if [ $links == "symbolic" ]
 		then
-			echo "$static --> $linkfile em $onde"
-			cp -v $onde $dir
-			(cd $dir;ln -s $static $linkfile)
- 	
+			#echo "$static --> $linkfile em $origem"
+			cp -v $origem $libdir
+			(cd $libdir;ln -sf $static $linkfile)
+ 		else
+			cp -v $libs $libdir	
 		fi
-		sleep 1
 	fi
 done	
 
+cp -vf "$1" "$bindir"
+
+exit 0
