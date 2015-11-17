@@ -23,18 +23,18 @@ do
 	if [ -e $libs ]
 	then
 		links=`file $libs|cut -d':' -f2|cut -d' ' -f2`
-		static=`ls -l $libs|cut -d'>' -f2`
-		origem=`whereis $static|cut -d' ' -f2`
-		linkfile=`file $libs|cut -d':' -f1|tr '/' '\n'|fgrep "."`
 		if [ $links == "symbolic" ]
 		then
+			static=`ls -l $libs|cut -d'>' -f2`
+			linkfile=`file $libs|cut -d':' -f1|tr '/' '\n'|fgrep "."`
+			origem=`find / |grep $static|head -1`
 			#echo "$static --> $linkfile em $origem"
 			cp -v $origem $libdir
 			(cd $libdir;ln -sf $static $linkfile)
  		else
 			cp -v $libs $libdir	
 		fi
-	fi
+	fi	
 done	
 
 cp -vf "$1" "$bindir"
