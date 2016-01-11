@@ -1,0 +1,42 @@
+#!/bin/sh
+#By: isca
+#Ctba 16-11-15
+#This script take all shared librarys from a binary file and make a packet
+#i use this a lot to make a little embeded systems with C binaries
+
+lib=`ldd $1|cut -d'>' -f 2|cut -d'(' -f1`
+libdir="./lib"
+bindir="./bin"
+
+if [ ! -e $libdir ]
+then
+	mkdir $libdir
+fi
+
+if [ ! -e $bindir ]
+then
+	mkdir $bindir
+fi
+
+for libs in $lib
+do
+	if [ -e $libs ]
+	then
+		links=`file $libs|cut -d':' -f2|cut -d' ' -f2`
+		if [ $links == "symbolic" ]
+		then
+			static=`ls -l $libs|cut -d'>' -f2`
+			linkfile=`file $libs|cut -d':' -f1|tr '/' '\n'|fgrep "."`
+			origem=`find / |grep $static|head -1`
+			#echo "$static --> $linkfile em $origem"
+			cp -v $origem $libdir
+			(cd $libdir;ln -sf $static $linkfile)
+ 		else
+			cp -v $libs $libdir	
+		fi
+	fi	
+done	
+
+cp -vf "$1" "$bindir"
+
+exit 0

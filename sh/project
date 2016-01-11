@@ -1,0 +1,28 @@
+#!/bin/bash
+#By isca
+#This simple case just for splash my fluxbox screen on an old thinkpad
+#Very simple xrandr case...
+
+case "$1" in
+query)
+xrandr -q
+;;
+mirror)
+xrandr --output VGA-0 --mode 1024x768
+;;
+left)
+#xrandr --output VGA-0 --mode 1024x768 --left-of LVDS
+xrandr --output VGA-0 --mode 1024x768 --left-of LVDS --noprimary
+;;
+right)
+#xrandr --output VGA-0 --mode 1024x768 --right-of LVDS
+xrandr --output VGA-0 --mode 1024x768 --right-of LVDS --noprimary
+;;
+clean)
+xrandr --auto --output VGA-0 --off
+;;
+*)
+echo "Use: query/mirror/left/right/clean"
+;;
+esac
+exit 0
