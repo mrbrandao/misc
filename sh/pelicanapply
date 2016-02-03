@@ -1,0 +1,6 @@
+#!/bin/bash 
+#This is a little script to fast change pelican THEME's 
+#it must be placed and runned from your project root where pelicanconf.py stay.
+sed 's/.*THEME.*/THEME = u'"'$1'"'/g' pelicanconf.py >> /tmp/foo
+mv /tmp/foo ./pelicanconf.py
+echo done
