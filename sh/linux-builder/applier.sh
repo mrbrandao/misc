@@ -30,16 +30,16 @@ limpa(){
 	cp -f "$2" "$3"
 	for i in "${name[@]}" 
 	do
-		grep -v "$i" "$3" > "$4"
+		grep -v "$i" "$3" >> "$4"
 		mv "$4" "$3"
 	done
 	mv -b "$3" "$2"
 }
 grava(){
 #Esta funcao percorre o array passando em $1 gravando os novos dados encontrados
-#Copy /etc/bashrc to /tmp/bashrc
+	
+	#Copy /etc/bashrc to /tmp/bashrc
 	cp -f "$2" "$3" 
-
 	#percorre o array de nome recebido em $1
 	for i in "${name[@]}"
 	do
@@ -52,21 +52,70 @@ grava(){
 #Improving command with my pref's aliases
 if  grep -e "${name[0]}" "$2" >>/dev/null
 then
+	echo ${name[0]}
 	echo "Ja existem entradas em "$2""
 	read -p "Voce deseja substituilos? (s/N) : " resprc
 	if [ $resprc == S -o $resprc == s ] 
 	then
-		limpa
+
+		#Esta funcao percorre o array $1 removendo os dados do arquivo
+		cp -f "$2" "$3"
+		for i in "${name[@]}" 
+		do
+			grep -v "$i" "$3" >> "$4"
+			mv "$4" "$3"
+		done
+		mv -b "$3" "$2"
+	
+		#Copy /etc/bashrc to /tmp/bashrc
+		cp -f "$2" "$3" 
+		#percorre o array de nome recebido em $1
+		for i in "${name[@]}"
+		do
+			echo "Gravando $i"	
+			echo "$i" >> "$3"
+		done
+		mv -vb "$3" "$2"
+
+
+
 	else
-		echo ""$1" nao serao aplicados!"
-		exit 0
+		read -p "Deseja entao limpar as entradas antidas de $1 em seu arquivo $PATHRC? (s/N): " respclean
+		if [ $respclean == S -o $respclean == s ]
+		then
+			#Esta funcao percorre o array $1 removendo os dados do arquivo
+			cp -f "$2" "$3"
+			for i in "${name[@]}" 
+			do
+				grep -v "$i" "$3" >> "$4"
+				mv "$4" "$3"
+			done
+			mv -b "$3" "$2"
+		
+		else
+			echo ""$1" nao serao aplicados!"
+			exit 0
+		fi
 	fi
 		
+	
+else
+	read -p "Posso gravar em seu arquivo $PATHRC meus dados de $1? (s/N): " confirme
+	if [ !$confirme == S -o !$confirme == s ] 
+	then
+		echo "OK nao mudarei $PATHRC"
+		exit 0
+	fi
+
+		#Copy /etc/bashrc to /tmp/bashrc
+		cp -f "$2" "$3" 
+		#percorre o array de nome recebido em $1
+		for i in "${name[@]}"
+		do
+			echo "Gravando $i"	
+			echo "$i" >> "$3"
+		done
+		mv -vb "$3" "$2"
+
+
 fi
-for i in "${name[@]}"
-do
-	echo "Gravando $i"	
-	echo "$i" >> "$3"
-done
-mv -vb "$3" "$2"
-exit 0

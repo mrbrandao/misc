@@ -21,23 +21,9 @@ white="\033[37;40m"
 green="\033[32;40m"
 red="\033[31;40m"
 cian="\033[36;40m"
-clear="\033[0m"
+clean="\033[0m"
 
-
-#Discover my distro
-
-
-if [ -e /etc/arch-release ]
-then
-	DISTRORC="bash.bashrc"
-	PATHRC="/etc/$DISTRORC" 
-	VIMRC="vimrc"
-	PATHVIM="/etc/$VIMRC"
-fi
-
-
-TMPRC="/tmp/$DISTRORC"
-TMPRCRUN="/tmp/bashrc-run"
+source ./distros.sh
 
 aliases() {
 
@@ -51,7 +37,7 @@ alias[6]="alias ll=\"ls -lhG\""
 alias[7]="alias la=\"ls -aG\""
 alias[8]="alias l=\"ls -lahFG\""
 
-. ./applier.sh alias $PATHRC $TMPRC $TMPRCRUN
+source ./applier.sh alias $PATHRC $TMPRC $TMPRCRUN
 
 }
 
