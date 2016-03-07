@@ -1,0 +1,6 @@
+#!/bin/sh
+IN="eDP1"
+OUT="HDMI1"
+
+xrandr --output $IN --output $OUT --auto --left-of $IN
+
