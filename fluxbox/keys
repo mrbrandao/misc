@@ -186,11 +186,18 @@ Mod4 Print :Exec import -window root ~/screenshot$(date +%F_%H-%M-%S).png
 #xlock
 Mod4 l :Exec xlock -mode matrix
 
-#Window Move
-Mod4 Up :MoveUp 10
-Mod4 Down :MoveDown 10
-Mod4 Left :MoveLeft 10
-Mod4 Right :MoveRight 10
+#Window Focus
+Mod4 Up :FocusUp
+Mod4 Down :FocusDown
+Mod4 Left :FocusLeft
+Mod4 Right :FocusRight
+
+#window Move
+Mod1 Up :MoveUp 10
+Mod1 Down :MoveDown 10
+Mod1 Left :MoveLeft 10
+Mod1 Right :MoveRight 10
+
 
 #Window Resize
 #
