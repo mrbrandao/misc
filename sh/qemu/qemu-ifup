@@ -1,0 +1,96 @@
+#!/bin/sh
+#By:isca igorsca (at) gmail dot com
+#This is a qemu-ifup script to make bridge device with tap interfaces
+#It create a NAT qemu interface using a br0 with tapN interfaces.
+
+#Make sure you have TUN suport on your kernel: 
+#zcat /proc/config.gz|grep CONFIG_TUN
+
+#Make changes on ADDR and DHCP_RANGE if you want to use another subnet.
+#Place this file with 755 perms on /etc/qemu
+#Remeber to use qemu with sudo
+#This script depends dnsmasq,iproute2 and iptables installed.
+
+#Examples:
+
+#Runing single guest with NAT Bridge
+#qemu-system-i386 -enable-kvm -net tap -net nic system.img
+
+#Works with multiples qemu guest!
+#Running another guest together with another macaddr
+#qemu-system-i386 -enable-kvm -netdev tap,id=t1,ifname=tap1 -device e1000,mac=22:33:44:aa:bb:cc system.img
+
+#
+
+set -x
+
+IFACE="br0"
+ERRO=
+WAN=`ip route|grep default|awk '{print $5}'`
+IP=`which iptables`
+MASQPID="/var/run/qemu-dnsmasq-"$IFACE".pid"
+DHCP_RANGE="192.168.53.2,192.168.53.11"
+ADDR="192.168.53.1/27"
+
+if [ ! -n "$1" ]
+then
+	echo "Ups... interface argument missing"
+	ERRO=1000
+	exit $ERRO
+fi	
+
+TAP="$1"
+
+netup(){
+#load tun tap kernel module
+#create a bridge br0 with ip seted on ADDR var. Create a tap interface used with qemu -net tap
+	if ! ip link show $IFACE 2>/dev/null 1>/dev/null
+	then
+		ip link add $IFACE type bridge
+		ip link set $IFACE up
+	fi
+
+	modprobe tun 2>&1 >>/dev/null
+ 	ip tuntap add dev "$TAP" mode tap 
+	ip link set "$TAP" up
+	ip link set "$TAP" master "$IFACE"
+	
+	IPBR=`ip addr show dev $IFACE|grep inet|head -1|awk '{print $2}'`
+	if [ ! $IPBR == $ADDR ]
+	then
+		ip addr add dev $IFACE "$ADDR"
+	fi
+}
+
+masquerade(){
+#make a masquerade interface betewen default route local iface and br0
+
+	echo "1" > /proc/sys/net/ipv4/ip_forward
+	$IP -D FORWARD -i $IFACE -o $WAN -j ACCEPT 2>>/dev/null
+	$IP -t nat -D PREROUTING -i $WAN -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT 2>>/dev/null
+	$IP -t nat -D POSTROUTING -o $WAN -j MASQUERADE 2>>/dev/null
+
+	$IP -A FORWARD -i $IFACE -o $WAN -j ACCEPT
+	$IP -t nat -A PREROUTING -i $WAN -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+	$IP -t nat -A POSTROUTING -o $WAN -j MASQUERADE
+	
+}
+
+dhcp(){
+#run dnsmasq dhcp on IFACE with binding and custom pidfile
+#the example above is the same as runing just with options in long form
+#dnsmasq --interface=$IFACE --bind-interfaces --pid-file=$MASQPID --dhcp-range=$DHCP_RANGE 	
+
+	if [ ! -e $MASQPID ]
+	then
+		dnsmasq -i $IFACE -z -x $MASQPID -F $DHCP_RANGE
+	fi
+}
+
+netup
+masquerade
+dhcp
+exit $ERRO
+
+
+
