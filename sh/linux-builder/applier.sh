@@ -80,7 +80,7 @@ then
 
 
 	else
-		read -p "Deseja entao limpar as entradas antidas de $1 em seu arquivo $PATHRC? (s/N): " respclean
+		read -p "Deseja entao limpar as entradas antidas de $1 em seu arquivo $2? (s/N): " respclean
 		if [ $respclean == S -o $respclean == s ]
 		then
 			#Esta funcao percorre o array $1 removendo os dados do arquivo
@@ -94,16 +94,16 @@ then
 		
 		else
 			echo ""$1" nao serao aplicados!"
-			exit 0
+			#exit 0
 		fi
 	fi
 		
 	
 else
-	read -p "Posso gravar em seu arquivo $PATHRC meus dados de $1? (s/N): " confirme
+	read -p "Posso gravar em seu arquivo $2 meus dados de $1? (s/N): " confirme
 	if [ !$confirme == S -o !$confirme == s ] 
 	then
-		echo "OK nao mudarei $PATHRC"
+		echo "OK nao mudarei $2"
 		exit 0
 	fi
 

@@ -28,12 +28,37 @@ clean="\033[0m"
 
 if [ -e /etc/arch-release ]
 then
+	#Bashrc
 	DISTRORC="bash.bashrc"
 	PATHRC="/etc/$DISTRORC" 
+	#Temps during copies
+	TMPRC="/tmp/$DISTRORC"
+	TMPRCRUN="/tmp/bashrc-run"
+
+	#vimrc
 	VIMRC="vimrc"
 	PATHVIM="/etc/$VIMRC"
-fi
+	TMPVIM="/tmp/vimrc"
+	TMPVIMRUN="/tmp/vimrc-run"
+	
+	#hosts
+	DISTROHOSTS="hosts"
+	PATHHOSTS="/etc/$DISTROHOSTS"
+	#Temps during copies
+	TMPHOSTS="/tmp/$DISTROHOSTS"
+	TMPHOSTSRUN="/tmp/hosts-run"
+	
+	#profile
+	DISTPROFILE="profile"
+	PATHPROFILE="/etc/$DISTPROFILE"
+	TMPPROF="/tmp/profile"
+	TMPPROFRUN="/tmp/profile-run"
+	
+	#inputrc
+	DISTINPUT="inputrc"
+	PATHINPUT="/etc/$DISTINPUT"
+	TMPINPUT="/tmp/inputrc"
+	TMPINPUTRUN="/tmp/inputrc-run"
 
-TMPRC="/tmp/$DISTRORC"
-TMPRCRUN="/tmp/bashrc-run"
+fi
 
