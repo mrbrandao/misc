@@ -11,6 +11,10 @@ SUDO=`which sudo`
 echo "Stoping the anoing .DS_Store files"
 defaults write com.apple.desktopservices DSDontWriteNetworkStores true
 #
+#Enabling iMovie Library across network
+#https://gist.github.com/isca0/ae542c7155813eb0d5f7971eb83f9ad1
+echo "Enabling iMovie across network"
+defaults write com.apple.iMovieApp allowNV -bool TRUE
 #Improving command with my pref's aliases
 echo "Irei pedir sua senha..."
 $SUDO sh -c 'echo "
