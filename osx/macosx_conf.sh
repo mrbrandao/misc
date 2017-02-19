@@ -29,6 +29,12 @@ alias la=\"ls -aG\"
 alias l=\"ls -lahFG\"
 " >> /etc/bashrc'
 #
+#Fixing GPG vars
+echo "
+GPG_TTY=$(tty)
+export GPG_TTY
+" >> ~/.profile
+
 #Enable colors on vim and set vim as default
 echo "Adicionando cores e syntaxes ao vim"
 $SUDO sh -c 'echo "
