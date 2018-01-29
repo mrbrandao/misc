@@ -1,41 +1,47 @@
-#!/bin/sh
+#!/bin/bash
 #By: isca
 #Ctba 16-11-15
 #This script take all shared librarys from a binary file and make a packet
 #i use this a lot to make a little embeded systems with C binaries
 
+#Change this paths to where you want libs/bin to be copied
+##################################
+
+libdir="/mnt/myjail/lib"
+bindir="/mnt/myjail/bin"
+
+###################################
+
 lib=`ldd $1|cut -d'>' -f 2|cut -d'(' -f1`
-libdir="./lib"
-bindir="./bin"
 
 if [ ! -e $libdir ]
 then
-	mkdir $libdir
+	mkdir -p $libdir
 fi
 
 if [ ! -e $bindir ]
 then
-	mkdir $bindir
+	mkdir -p $bindir
 fi
 
-for libs in $lib
-do
-	if [ -e $libs ]
+for lds in $lib;do
+	if [ -e $lds ]
 	then
-		links=`file $libs|cut -d':' -f2|cut -d' ' -f2`
-		if [ $links == "symbolic" ]
-		then
-			static=`ls -l $libs|cut -d'>' -f2`
-			linkfile=`file $libs|cut -d':' -f1|tr '/' '\n'|fgrep "."`
-			origem=`find / |grep $static|head -1`
-			#echo "$static --> $linkfile em $origem"
-			cp -v $origem $libdir
+		links=$(file "$lds"|cut -d':' -f2|cut -d' ' -f2)
+		if [ "$links" == symbolic ];then
+			static=`ls -l $lds|cut -d'>' -f2`
+			linkfile=`file $lds|cut -d':' -f1|tr '/' '\n'|fgrep "."`
+			origem=`find /lib /usr/lib /lib64 /usr/lib64 |grep $static|head -1`
+			echo "Symbolic link"
+			cp -fvp $origem $libdir
 			(cd $libdir;ln -sf $static $linkfile)
- 		else
-			cp -v $libs $libdir	
+
+		else
+			echo "Static ELF"
+			cp -fv $lds $libdir	
 		fi
-	fi	
-done	
+	fi
+done
 
 cp -vf "$1" "$bindir"
 
